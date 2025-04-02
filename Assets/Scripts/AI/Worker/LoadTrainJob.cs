@@ -39,6 +39,7 @@ public sealed class LoadTrainJob : WorkerJob, ISaveable
     internal override void StopWorking()
     {
         base.StopWorking();
+        _box.SetActive(false);
         _loot.Clear();
     }
 

@@ -38,6 +38,7 @@ public sealed class LoadMachineJob : WorkerJob, ISaveable
     internal override void StopWorking()
     {
         base.StopWorking();
+        _box.SetActive(false);
         _loot.Clear();
     }
 
