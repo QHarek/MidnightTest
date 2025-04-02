@@ -23,8 +23,8 @@ public class JobManager : MonoBehaviour, IWorkerStateObserver, IBuildingManagerO
     [SerializeField] private NavMeshAgent _navMeshAgent;
 
     [SerializeField] private Jobs _currentJob;
+    [SerializeField] private WorkerStates _workerState;
 
-    private WorkerStates _workerState;
     private List<Machine> _machines = new List<Machine>();
     private MineCart _mineCart;
     private Train _train;

@@ -20,7 +20,6 @@ public sealed class LoadTrainJob : WorkerJob, ISaveable
     private int _maxCapacity = 50;
     private bool _isLootEmpty = false;
 
-
     private void Start()
     {
         _inventoryManager = FindObjectOfType<InventoryManager>();
@@ -39,7 +38,6 @@ public sealed class LoadTrainJob : WorkerJob, ISaveable
     internal override void StopWorking()
     {
         base.StopWorking();
-        _box.SetActive(false);
         _loot.Clear();
     }
 
@@ -97,7 +95,10 @@ public sealed class LoadTrainJob : WorkerJob, ISaveable
         {
             StopWorking();
         }
-        StartCoroutine(CarryBoxToTrain());
+        else
+        {
+            StartCoroutine(CarryBoxToTrain());
+        }
     }
 
     private IEnumerator CarryBoxToTrain()

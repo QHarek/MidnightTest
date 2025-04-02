@@ -29,7 +29,6 @@ public sealed class LoadMachineJob : WorkerJob, ISaveable
     internal override void StartWorking(string? machineName = null)
     {
         base.StartWorking();
-        Debug.Log(machineName);
         _machine = GameObject.Find(machineName).GetComponent<Machine>();
         _loadSpot = GameObject.Find(machineName + "LoadSpot").transform;
         StartCoroutine(GoToStorage());
@@ -38,7 +37,6 @@ public sealed class LoadMachineJob : WorkerJob, ISaveable
     internal override void StopWorking()
     {
         base.StopWorking();
-        _box.SetActive(false);
         _loot.Clear();
     }
 
@@ -94,7 +92,10 @@ public sealed class LoadMachineJob : WorkerJob, ISaveable
         {
             StopWorking();
         }
-        StartCoroutine(CarryBoxToMachine());
+        else
+        {
+            StartCoroutine(CarryBoxToMachine());
+        }
     }
 
     private IEnumerator CarryBoxToMachine()

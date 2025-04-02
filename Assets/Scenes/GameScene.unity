@@ -3350,6 +3350,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: PaletteWooden_1
       objectReference: {fileID: 0}
+    - target: {fileID: 5038908395528868584, guid: 6656dcc5f01119848861032461b5aaf3, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 5667248867507898450, guid: 6656dcc5f01119848861032461b5aaf3, type: 3}
       propertyPath: m_LocalPosition.x
       value: 14.22

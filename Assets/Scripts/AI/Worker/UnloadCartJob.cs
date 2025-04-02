@@ -35,7 +35,7 @@ public sealed class UnloadCartJob : WorkerJob, ISaveable
     internal override void StopWorking()
     {
         base.StopWorking();
-        NotifyObservers(WorkerStates.Idle);
+        StopAllCoroutines();
     }
 
     private IEnumerator GoToCart()

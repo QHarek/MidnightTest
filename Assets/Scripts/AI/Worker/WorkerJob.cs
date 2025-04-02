@@ -24,7 +24,6 @@ public abstract class WorkerJob : MonoBehaviour
 
     internal virtual void StopWorking()
     {
-        StopAllCoroutines();
         NotifyObservers(WorkerStates.Idle);
     }
 
