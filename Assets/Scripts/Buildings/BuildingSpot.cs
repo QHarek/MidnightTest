@@ -56,7 +56,11 @@ public class BuildingSpot : MonoBehaviour, IBuildingManagerObserver
 
     private IEnumerator FreeSlot()
     {            
-        yield return new WaitForSeconds(15);
+        yield return new WaitForSeconds(14);
         _isOccupied = false;
+        if (_building != null)
+        {
+            _buildingManager.OnSpotCleared(_building);
+        }
     }
 }

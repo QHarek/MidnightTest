@@ -36,6 +36,7 @@ public class JobManager : MonoBehaviour, IWorkerStateObserver, IBuildingManagerO
 
     private void Start()
     {
+        SaveManager.Instance.jobManagers.Add(this);
         BuildingManager buildingManager = FindObjectOfType<BuildingManager>();
         buildingManager.AddObserver(this);
         _machines.AddRange(buildingManager.BuiltMachines);
@@ -161,7 +162,7 @@ public class JobManager : MonoBehaviour, IWorkerStateObserver, IBuildingManagerO
         {
             _currentJob = m_data.m_currentJob;
             _workerState = m_data.m_workerState;
-            transform.position = new Vector3(m_data.m_positionX, m_data.m_positionY, m_data.m_positionY);
+            transform.position = m_data.m_position.ToVector3();
             Debug.Log(gameObject.name + " JobManager Loaded");
         }
         else
@@ -176,9 +177,7 @@ public class JobManager : MonoBehaviour, IWorkerStateObserver, IBuildingManagerO
         {
             m_currentJob = _currentJob,
             m_workerState = _workerState,
-            m_positionX = transform.position.x,
-            m_positionY = transform.position.y,
-            m_positionZ = transform.position.z,
+            m_position = new SerializableVector3(transform.position),
         };
     }
 }
@@ -188,7 +187,5 @@ public class JobManagerData
 {
     public Jobs m_currentJob;
     public WorkerStates m_workerState;
-    public float m_positionX;
-    public float m_positionY;
-    public float m_positionZ;
+    public SerializableVector3 m_position;
 }

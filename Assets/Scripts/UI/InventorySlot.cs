@@ -1,9 +1,12 @@
 using UnityEngine;
 using TMPro;
+using System.Collections.Generic;
 
 public class InventorySlot : MonoBehaviour
 {
     [SerializeField] private TextMeshProUGUI _itemCountText;
+    [SerializeField] private ButtonPressedIndicator _recycleButtonIndicator;
+    [SerializeField] private ButtonPressedIndicator _keepButtonIndicator;
     [SerializeField] private TMP_InputField _amountInputField;
     [SerializeField] private InventoryManager _inventoryManager;
     [SerializeField] private string _itemId;
@@ -41,6 +44,16 @@ public class InventorySlot : MonoBehaviour
         if (_keepThis)
         {
             UpdateKeepAmount();
+        }
+    }
+
+    public void OnGameLoad(KeyValuePair<string, int> keepItem, string recycleItem)
+    {
+        _recycleButtonIndicator.OnGameLoad(recycleItem != null);
+        if (keepItem.Value > 0)
+        {
+            _keepButtonIndicator.OnGameLoad(true);
+            _amountInputField.text = keepItem.Value.ToString();
         }
     }
 }

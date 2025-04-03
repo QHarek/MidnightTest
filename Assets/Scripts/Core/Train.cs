@@ -28,6 +28,7 @@ public class Train : MonoBehaviour, ISaveable
 
     private void Start()
     {
+        SaveManager.Instance.trainInstance = this;
         StartCoroutine(MoveToWareHouse());
         _balanceManager = FindObjectOfType<BalanceManager>();
     }
@@ -75,14 +76,38 @@ public class Train : MonoBehaviour, ISaveable
 
     private void SellLoot()
     {
-        _loot["CrystalCommon"] *= _ecomonicsSettings.commonCrystalValue;
-        _loot["CrystalUncommon"] *= _ecomonicsSettings.uncommonCrystalValue;
-        _loot["CrystalRare"] *= _ecomonicsSettings.rareCrystalValue;
-        _loot["CrystalEpic"] *= _ecomonicsSettings.epicCrystalValue;
-        _loot["DustCommon"] *= _ecomonicsSettings.commonDustValue;
-        _loot["DustUncommon"] *= _ecomonicsSettings.uncommonDustValue;
-        _loot["DustRare"] *= _ecomonicsSettings.rareDustValue;
-        _loot["DustEpic"] *= _ecomonicsSettings.epicDustValue;
+        if (_loot.ContainsKey("CrystalCommon"))
+        {
+            _loot["CrystalCommon"] *= _ecomonicsSettings.commonCrystalValue;
+        }
+        if (_loot.ContainsKey("CrystalUncommon"))
+        {
+            _loot["CrystalUncommon"] *= _ecomonicsSettings.uncommonCrystalValue;
+        }
+        if (_loot.ContainsKey("CrystalRare"))
+        {
+            _loot["CrystalRare"] *= _ecomonicsSettings.rareCrystalValue;
+        }
+        if (_loot.ContainsKey("CrystalEpic"))
+        {
+            _loot["CrystalEpic"] *= _ecomonicsSettings.epicCrystalValue;
+        }
+        if (_loot.ContainsKey("DustCommon"))
+        {
+            _loot["DustCommon"] *= _ecomonicsSettings.commonDustValue;
+        }
+        if (_loot.ContainsKey("DustUncommon"))
+        {
+            _loot["DustUncommon"] *= _ecomonicsSettings.uncommonDustValue;
+        }
+        if (_loot.ContainsKey("DustRare"))
+        {
+            _loot["DustRare"] *= _ecomonicsSettings.rareDustValue;
+        }
+        if (_loot.ContainsKey("DustEpic"))
+        {
+            _loot["DustEpic"] *= _ecomonicsSettings.epicDustValue;
+        }
 
         _balanceManager.AddMoney(_loot);
     }
@@ -94,9 +119,9 @@ public class Train : MonoBehaviour, ISaveable
         if (m_data != null)
         {
             _loot.Clear();
-            _loot.AddRange(m_data.Loot);
-            transform.position = new Vector3(m_data.positionX, m_data.positionY, m_data.positionZ);
-            _isAvailableToLoad = m_data.IsAvailableToLoad;
+            _loot.AddRange(m_data.m_loot);
+            transform.position = m_data.m_position.ToVector3();
+            _isAvailableToLoad = m_data.m_isAvailableToLoad;
             if (_isAvailableToLoad)
             {
                 StartCoroutine(MoveToWareHouse());
@@ -118,13 +143,11 @@ public class Train : MonoBehaviour, ISaveable
     {
         TrainData m_data = new TrainData()
         {
-            Loot = new Dictionary<string, int>(),
-            positionX = transform.position.x,
-            positionY = transform.position.y,
-            positionZ = transform.position.z,
-            IsAvailableToLoad = _isAvailableToLoad
+            m_loot = new Dictionary<string, int>(),
+            m_position = new SerializableVector3(transform.position),
+            m_isAvailableToLoad = _isAvailableToLoad
         };
-        m_data.Loot.AddRange(_loot);
+        m_data.m_loot.AddRange(_loot);
         return m_data;
     }
 }
@@ -132,9 +155,7 @@ public class Train : MonoBehaviour, ISaveable
 [System.Serializable]
 public class TrainData
 {
-    public Dictionary<string, int> Loot;
-    public float positionX;
-    public float positionY;
-    public float positionZ;
-    public bool IsAvailableToLoad;
+    public Dictionary<string, int> m_loot;
+    public SerializableVector3 m_position;
+    public bool m_isAvailableToLoad;
 }

@@ -9,6 +9,7 @@ public class BalanceManager : MonoBehaviour, ISaveable
     private float _lastCalculateTime;
     private float _calculatePeriod = 60;
     private int _balance = 10000;
+    private bool _isLoaded = false;
 
     private Dictionary<string, int> _incomeList = new Dictionary<string, int>()    {
         {"CrystalCommon", 0 },
@@ -34,6 +35,32 @@ public class BalanceManager : MonoBehaviour, ISaveable
     };
 
     public int Balance => _balance;
+
+    private void Start()
+    {
+        SaveManager.Instance.balanceManagerInstance = this;
+        if (!_isLoaded)
+        {
+            CalculateExpeditures();
+        }
+        else
+        {
+            _isLoaded = true;
+        }
+    }
+
+    private void Update()
+    {
+        if (Time.time - _lastCalculateTime >= _calculatePeriod)
+        {
+            CalculateExpeditures();
+        }
+
+        if (_balance < -5000)
+        {
+
+        }
+    }
 
     public void AddMoney(Dictionary<string, int> lootValue)
     {
@@ -85,24 +112,6 @@ public class BalanceManager : MonoBehaviour, ISaveable
         };
     }
 
-    private void Start()
-    {
-        CalculateExpeditures();
-    }
-
-    private void Update()
-    {
-        if (Time.time - _lastCalculateTime >= _calculatePeriod)
-        {
-            CalculateExpeditures();
-        }
-
-        if (_balance < -5000)
-        {
-
-        }
-    }
-
     private void CalculateExpeditures()
     {
         foreach (var item in _regularExpeditureList)
@@ -119,16 +128,17 @@ public class BalanceManager : MonoBehaviour, ISaveable
         BalanceManagerData m_data = data as BalanceManagerData;
         if (m_data != null)
         {
-            _lastCalculateTime = Time.time + m_data.m_lastCalculateTime;
-            _balance = m_data.m_balance;
+            _lastCalculateTime = Time.time - m_data.m_lastCalculateTime;
             _incomeList.Clear();
             _incomeList.AddRange(m_data.m_incomeList);
             _expeditureList.Clear();
             _expeditureList.AddRange(m_data.m_expeditureList);
             _regularExpeditureList.Clear();
             _regularExpeditureList.AddRange(m_data.m_regularExpeditureList);
+            _balance = m_data.m_balance;
             _balanceUIUpdate.UpdateBalanceUI("expediture", _regularExpeditureList);
             _balanceUIUpdate.UpdateBalanceUI("income", _incomeList);
+            _isLoaded = true;
             Debug.Log("BalanceManager Loaded");
         }
         else

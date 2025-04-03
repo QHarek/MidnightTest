@@ -44,6 +44,11 @@ public abstract class Machine : MonoBehaviour, ISaveable, IBuildingManagerObserv
         _updateUI = GameObject.Find(_buildingName + "Container").GetComponent<MachineUIUpdate>();
     }
 
+    private void Start()
+    {
+        SaveManager.Instance.machines.Add(this);
+    }
+
     internal abstract void ProcessLoot(bool isLoaded = false);
 
     public virtual void Upgrade()
@@ -124,8 +129,7 @@ public abstract class Machine : MonoBehaviour, ISaveable, IBuildingManagerObserv
         {
             StopAllCoroutines();
             _buildingName = m_data.m_buildingName;
-            _buildingLevel = m_data.m_buildingLevel;
-            _buildingSpot = m_data.m_buildingSpot;
+            _buildingSpot = GameObject.Find(m_data.m_buildingSpotName).GetComponent<BuildingSpot>();
             _isAvailable = m_data.m_isAvailable;
             _processingProgress = m_data.m_processingProgress;
             _rawLoot.Clear();
@@ -138,7 +142,7 @@ public abstract class Machine : MonoBehaviour, ISaveable, IBuildingManagerObserv
             }
             else
             {
-                for (int i = 1; i < _buildingLevel; i++)
+                for (int i = 1; i < m_data.m_buildingLevel; i++)
                 {
                     Upgrade();
                 }
@@ -162,7 +166,7 @@ public abstract class Machine : MonoBehaviour, ISaveable, IBuildingManagerObserv
         {
             m_buildingName = _buildingName,
             m_buildingLevel = _buildingLevel,
-            m_buildingSpot = _buildingSpot,
+            m_buildingSpotName = _buildingSpot.gameObject.name,
             m_rawLoot = new Dictionary<string, int>(),
             m_processedLoot = new Dictionary<string, int>(),
             m_isAvailable = _isAvailable,
@@ -179,7 +183,7 @@ public class MachineData
 {
     public string m_buildingName;
     public int m_buildingLevel;
-    public BuildingSpot m_buildingSpot;
+    public string m_buildingSpotName;
     public Dictionary<string, int> m_rawLoot;
     public Dictionary<string, int> m_processedLoot;
     public bool m_isAvailable;

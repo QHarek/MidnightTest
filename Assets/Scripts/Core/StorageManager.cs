@@ -11,6 +11,7 @@ public class StorageManager : MonoBehaviour, ISaveable
 
     private void Start()
     {
+        SaveManager.Instance.storageManagerInstance = this;
         _capacityUpdater.UpdateMaxCapacity(_capacity);
     }
 
@@ -37,7 +38,6 @@ public class StorageManager : MonoBehaviour, ISaveable
     {
         return new StorageManagerData()
         {
-            Capacity = _capacity,
             ActiveUnitIndex = _activeUnitIndex,
         };
     }
@@ -47,9 +47,7 @@ public class StorageManager : MonoBehaviour, ISaveable
         StorageManagerData m_data = data as StorageManagerData;
         if (m_data != null)
         {
-            _capacity = m_data.Capacity;
-            _activeUnitIndex = m_data.ActiveUnitIndex;
-            for (int i = 0; i < m_data.ActiveUnitIndex; i++)
+            for (int i = 1; i < m_data.ActiveUnitIndex; i++)
             {
                 ExpandStorage();
             }
@@ -65,6 +63,5 @@ public class StorageManager : MonoBehaviour, ISaveable
 [System.Serializable]
 public class StorageManagerData
 {
-    public int Capacity;
     public int ActiveUnitIndex;
 }

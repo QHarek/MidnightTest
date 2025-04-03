@@ -53,6 +53,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _itemCountText: {fileID: 4399471264462496853}
+  _recycleButtonIndicator: {fileID: 7839036702442925674}
+  _keepButtonIndicator: {fileID: 3268371205272984380}
   _amountInputField: {fileID: 173028480205185570}
   _inventoryManager: {fileID: 0}
   _itemId: 

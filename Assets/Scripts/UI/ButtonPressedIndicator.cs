@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-public class ButtonPressedIndicator : MonoBehaviour, ISaveable
+public class ButtonPressedIndicator : MonoBehaviour
 {
     [SerializeField] private Image _image;
     private Color _initialColor;
@@ -28,40 +28,12 @@ public class ButtonPressedIndicator : MonoBehaviour, ISaveable
         }
     }
 
-    public void Load(object data)
+    public void OnGameLoad(bool isEnabled)
     {
-        ButtonPressedIndicatorData m_data = data as ButtonPressedIndicatorData;
-        if (m_data != null)
+        if (isEnabled)
         {
-            _image.color = new Color(m_data.ColorR, m_data.ColorG, m_data.ColorB, m_data.ColorA);
-            _toggled = m_data.IsToggled;
-            Debug.Log("Button" + gameObject.name + " Loaded");
-        }
-        else
-        {
-            Debug.LogWarning("Button" + gameObject.name + " Load Error");
+            _image.color = Color.green;
+            _toggled = true;
         }
     }
-
-    public object Save()
-    {
-        return new ButtonPressedIndicatorData()
-        {
-            ColorR = _image.color.r,
-            ColorG = _image.color.g,
-            ColorB = _image.color.b,
-            ColorA = _image.color.a,
-            IsToggled = _toggled,
-        };
-    }
-}
-
-[System.Serializable]
-public class ButtonPressedIndicatorData
-{
-    public float ColorR;
-    public float ColorG;
-    public float ColorB;
-    public float ColorA;
-    public bool IsToggled;
 }

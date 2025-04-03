@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -8,23 +9,21 @@ public class WorkerHireManager : MonoBehaviour, ISaveable
     [SerializeField] private TMPro.TextMeshProUGUI _amountText;
     [SerializeField] private int _maxAmount;
 
-    private int _workersAmount = 0;
     private List<GameObject> _workers = new List<GameObject>();
 
     private void Start()
     {
-        Hire();
+        SaveManager.Instance.workerHireManagerInstance = this;
     }
 
     public void Hire()
     {
-        if (_workersAmount != _maxAmount)
+        if (_workers.Count != _maxAmount)
         {
             _workers.Add(Instantiate(_worker, new Vector3(0, 0, -27), Quaternion.identity, _spawnPoint));
             FindObjectOfType<BalanceManager>().AddRegularExpediture(20, "Workers");
             FindObjectOfType<BalanceManager>().RemoveMoney(200, null);
-            _workersAmount++;
-            _amountText.text = _workersAmount.ToString();
+            _amountText.text = _workers.Count.ToString();
         }
     }
 
@@ -33,20 +32,15 @@ public class WorkerHireManager : MonoBehaviour, ISaveable
         WorkerHireManagerData m_data = data as WorkerHireManagerData;
         if (m_data != null)
         {
-            _workersAmount = m_data.MinersCount;
             for (int i = 0; i < _workers.Count; i++)
             {
                 Destroy(_workers[i]);
             }
             _workers.Clear();
-            for (int i = 0; i < _workersAmount; i++)
+            for (int i = 0; i < m_data.m_workersAmount; i++)
             {
                 Hire();
-                //_workers[i].GetComponent<JobManager>().Load(LoadManager.gameData.jobManagerDataList[i]);
-                //_workers[i].GetComponent<UnloadCartJob>().Load(LoadManager.gameData.unloadCartJobDataList[i]);
-                //_workers[i].GetComponent<UnloadMachineJob>().Load(LoadManager.gameData.unloadMachineJobDataList[i]);
-                //_workers[i].GetComponent<LoadTrainJob>().Load(LoadManager.gameData.loadTrainJobDataList[i]);
-                //_workers[i].GetComponent<LoadMachineJob>().Load(LoadManager.gameData.loadMachineJobDataList[i]);
+                StartCoroutine(LoadComponents(i));
             }
             Debug.Log("WorkerHireManagerData Loaded");
         }
@@ -56,11 +50,34 @@ public class WorkerHireManager : MonoBehaviour, ISaveable
         }
     }
 
+    private IEnumerator LoadComponents(int index)
+    {
+        JobManager jobManager = null;
+        yield return new WaitUntil(() => _workers[index].TryGetComponent(out jobManager));
+        jobManager.Load(LoadManager.gameData.jobManagerDataList[index]);
+
+        UnloadCartJob unloadCartJob = null;
+        yield return new WaitUntil(() => _workers[index].TryGetComponent(out unloadCartJob));
+        unloadCartJob.Load(LoadManager.gameData.unloadCartJobDataList[index]);
+
+        UnloadMachineJob unloadMachineJob = null;
+        yield return new WaitUntil(() => _workers[index].TryGetComponent(out unloadMachineJob));
+        unloadMachineJob.Load(LoadManager.gameData.unloadMachineJobDataList[index]);
+
+        LoadTrainJob loadTrainJob = null;
+        yield return new WaitUntil(() => _workers[index].TryGetComponent(out loadTrainJob));
+        loadTrainJob.Load(LoadManager.gameData.loadTrainJobDataList[index]);
+
+        LoadMachineJob loadMachineJob = null;
+        yield return new WaitUntil(() => _workers[index].TryGetComponent(out loadMachineJob));
+        loadMachineJob.Load(LoadManager.gameData.loadMachineJobDataList[index]);
+    }
+
     public object Save()
     {
         return new WorkerHireManagerData()
         {
-            MinersCount = _workersAmount,
+            m_workersAmount = _workers.Count,
         };
     }
 }
@@ -68,5 +85,5 @@ public class WorkerHireManager : MonoBehaviour, ISaveable
 [System.Serializable]
 public class WorkerHireManagerData
 {
-    public int MinersCount;
+    public int m_workersAmount;
 }

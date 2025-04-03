@@ -5,13 +5,9 @@ public class LoadButton : MonoBehaviour
 {
     [SerializeField] private string sceneToLoad = "GameScene";
 
-    private void Start()
-    {
-        SceneManager.sceneLoaded += OnSceneLoaded;
-    }
-
     public void OnLoadButtonPressed()
     {
+        SceneManager.sceneLoaded += OnSceneLoaded;
         SceneManager.LoadScene(sceneToLoad);
     }
 

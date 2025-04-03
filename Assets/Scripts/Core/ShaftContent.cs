@@ -19,6 +19,11 @@ public class ShaftContent : MonoBehaviour, ISaveable
     private int _level = 1;
     private int _maxLevel = 4;
 
+    private void Start()
+    {
+        SaveManager.Instance.shaftContentInstance = this;
+    }
+
     private void UpgradeOuterCrystals()
     {
         Color color = Color.grey;
@@ -75,8 +80,7 @@ public class ShaftContent : MonoBehaviour, ISaveable
         ShaftContentData m_data = data as ShaftContentData;
         if (m_data != null)
         {
-            _level = m_data.Level;
-            for (int i = 1; i < _level; i++)
+            for (int i = 1; i < m_data.Level; i++)
             {
                 UpgradeShaft();
             }

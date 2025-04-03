@@ -1,10 +1,13 @@
 using UnityEngine;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
+using System.Collections;
 
 public class BuildingManager : MonoBehaviour, ISaveable
 {
     [SerializeField] private Transform _buildingSpotsParent;
+    [SerializeField] private List<GameObject> _buildingPrefabs ;
     [SerializeField] private int _maxBuildingsPerType = 1;
 
     private Dictionary<string, int> _buildingCounts = new Dictionary<string, int>();
@@ -30,6 +33,11 @@ public class BuildingManager : MonoBehaviour, ISaveable
             }
         }
         BuildingCounts = new ReadOnlyDictionary<string, int>(_buildingCounts);
+    }
+
+    private void Start()
+    {
+        SaveManager.Instance.buildingManagerInstance = this;
     }
 
     private void NotifyObservers(BuildingAction action, Machine building)
@@ -104,14 +112,18 @@ public class BuildingManager : MonoBehaviour, ISaveable
     {
         if (_destroyMode && buildingToDestroy != null)
         {
-            _builtMachines.Remove(buildingToDestroy);
             NotifyObservers(BuildingAction.Destroy, buildingToDestroy);
-            string buildingName = buildingToDestroy.BuildingName;
-            if (_buildingCounts.ContainsKey(buildingName))
-            {
-                _buildingCounts[buildingName]--;
-            }
             UpdateBuildingSpotsColor();
+        }
+    }
+
+    public void OnSpotCleared(Machine buildingToDestroy)
+    {
+        _builtMachines.Remove(buildingToDestroy);
+        string buildingName = buildingToDestroy.BuildingName;
+        if (_buildingCounts.ContainsKey(buildingName))
+        {
+            _buildingCounts[buildingName]--;
         }
     }
 
@@ -147,6 +159,13 @@ public class BuildingManager : MonoBehaviour, ISaveable
         }
     }
 
+    private IEnumerator LoadComponents(int index)
+    {
+        Machine machineInstance = null;
+        yield return new WaitUntil(() => _builtMachines[index].TryGetComponent(out machineInstance));
+        machineInstance.Load(LoadManager.gameData.machineDataList[index]);
+    }
+
     public void Load(object data)
     {
         BuildingManagerData m_data = data as BuildingManagerData;
@@ -156,9 +175,12 @@ public class BuildingManager : MonoBehaviour, ISaveable
             _buildingCounts.Clear();
             for (int i = 0; i < m_data.m_builtMachines.Count; i++)
             {
-                _currentBuilding = m_data.m_builtMachines[i];
-                BuildBuilding(m_data.m_builtMachines[i].BuildingSpot);
-                _builtMachines[i].GetComponent<Machine>().Load(LoadManager.gameData.machineDataList[i]);
+                _buildingMode = true;
+                GameObject prefab = _buildingPrefabs.Where(m => m.name == m_data.m_builtMachines.ElementAt(i).Key).First();
+                _currentBuilding = prefab.GetComponent<Machine>();
+                GameObject spot = GameObject.Find(m_data.m_builtMachines.ElementAt(i).Value);
+                BuildBuilding(spot.GetComponent<BuildingSpot>());
+                StartCoroutine(LoadComponents(i));
             }
             Debug.Log("BuildingManagerData Loaded");
         }
@@ -170,11 +192,14 @@ public class BuildingManager : MonoBehaviour, ISaveable
 
     public object Save()
     {
-        BuildingManagerData data = new BuildingManagerData() 
+        BuildingManagerData data = new BuildingManagerData()
         {
-            m_builtMachines = new List<Machine>(),
+            m_builtMachines = new Dictionary<string, string>(),
         };
-        data.m_builtMachines.AddRange(_builtMachines);
+        foreach (var item in _builtMachines)
+        {
+            data.m_builtMachines.Add(item.name, item.BuildingSpot.name);
+        }
 
         return data;
     }
@@ -183,5 +208,5 @@ public class BuildingManager : MonoBehaviour, ISaveable
 [System.Serializable]
 public class BuildingManagerData
 {
-    public List<Machine> m_builtMachines;
+    public Dictionary<string, string> m_builtMachines;
 }

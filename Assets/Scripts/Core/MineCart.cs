@@ -23,6 +23,7 @@ public class MineCart : MonoBehaviour, ISaveable
 
     private void Start()
     {
+        SaveManager.Instance.mineCartInstance = this;
         _maxCapacity = _mineCartUIUpdater.MaxCapacity;
     }
 
@@ -93,11 +94,12 @@ public class MineCart : MonoBehaviour, ISaveable
         if (m_data != null)
         {
             _loot.Clear();
-            _loot.AddRange(m_data.Loot);
-            _currentCapacity = m_data.CurrentCapacity;
-            _isAvailableToFill = m_data.IsAvailableToFill;
-            _isAvailableToUnload = m_data.IsAvailableToUnload;
-            transform.position = new Vector3(m_data.positionX, m_data.positionY, m_data.positionZ);
+            _loot.AddRange(m_data.m_loot);
+            _currentCapacity = m_data.m_currentCapacity;
+            _isAvailableToFill = m_data.m_isAvailableToFill;
+            _isAvailableToUnload = m_data.m_isAvailableToUnload;
+            _maxCapacity = _mineCartUIUpdater.MaxCapacity;
+            transform.position = m_data.m_position.ToVector3();
 
             if (_isAvailableToFill && _currentCapacity == 0)
             {
@@ -119,15 +121,13 @@ public class MineCart : MonoBehaviour, ISaveable
     {
         MineCartData m_data = new MineCartData()
         {
-            Loot = new Dictionary<string, int>(),
-            positionX = transform.position.x,
-            positionY = transform.position.y,
-            positionZ = transform.position.z,
-            CurrentCapacity = _currentCapacity,
-            IsAvailableToFill = _isAvailableToFill,
-            IsAvailableToUnload = _isAvailableToUnload,
+            m_loot = new Dictionary<string, int>(),
+            m_position = new SerializableVector3(transform.position),
+            m_currentCapacity = _currentCapacity,
+            m_isAvailableToFill = _isAvailableToFill,
+            m_isAvailableToUnload = _isAvailableToUnload,
         };
-        m_data.Loot.AddRange(_loot);
+        m_data.m_loot.AddRange(_loot);
         return m_data;
     }
 }
@@ -135,11 +135,9 @@ public class MineCart : MonoBehaviour, ISaveable
 [System.Serializable]
 public class MineCartData
 {
-    public Dictionary<string, int> Loot;
-    public float positionX;
-    public float positionY;
-    public float positionZ;
-    public int CurrentCapacity;
-    public bool IsAvailableToUnload;
-    public bool IsAvailableToFill;
+    public Dictionary<string, int> m_loot;
+    public SerializableVector3 m_position;
+    public int m_currentCapacity;
+    public bool m_isAvailableToUnload;
+    public bool m_isAvailableToFill;
 }

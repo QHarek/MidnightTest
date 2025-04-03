@@ -34,7 +34,7 @@ public class LoadManager : MonoBehaviour
         }
 
         string json = File.ReadAllText(FilePath);
-        GameData gameData = JsonConvert.DeserializeObject<GameData>(json);
+        gameData = JsonConvert.DeserializeObject<GameData>(json);
         Debug.Log("Игра загружена из " + FilePath);
 
         MineCart mineCart = FindObjectOfType<MineCart>();
@@ -57,16 +57,6 @@ public class LoadManager : MonoBehaviour
         if (settingsManager != null)
         {
             settingsManager.Load(gameData.settingsManagerData);
-        }
-
-        ButtonPressedIndicator[] buttonIndicators = FindObjectsOfType<ButtonPressedIndicator>();
-        if (gameData.buttonPressedIndicatorDataList != null)
-        {
-            int count = Mathf.Min(buttonIndicators.Length, gameData.buttonPressedIndicatorDataList.Count);
-            for (int i = 0; i < count; i++)
-            {
-                buttonIndicators[i].Load(gameData.buttonPressedIndicatorDataList[i]);
-            }
         }
 
         StorageManager storageManager = FindObjectOfType<StorageManager>();

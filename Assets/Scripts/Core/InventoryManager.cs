@@ -46,6 +46,7 @@ public class InventoryManager : MonoBehaviour, ISaveable
 
     private void Start()
     {
+        SaveManager.Instance.inventoryManagerInstance = this;
         PublicItems = new ReadOnlyDictionary<string, int>(_items);
     }
 
@@ -216,12 +217,13 @@ public class InventoryManager : MonoBehaviour, ISaveable
             _currentCapacity = m_data.m_currentCapacity;
             _isFull = m_data.m_isFull;
             _readyForRecycle = m_data.m_readyForRecycle;
-            _itemsToRecycle.Clear();
+            _itemsToRecycle = new List<string>();
             _itemsToRecycle.AddRange(m_data.m_itemsToRecycle);
-            _items.Clear();
+            _items = new Dictionary<string, int>();
             _items.AddRange(m_data.m_items);
-            _keepAmounts.Clear();
+            _keepAmounts = new Dictionary<string, int>();
             _keepAmounts.AddRange(m_data.m_keepAmounts);
+            _inventoryUIUpdater.OnGameLoad(_keepAmounts, _itemsToRecycle);
             EnableDisableBoxes(_currentCapacity);
             Debug.Log("InventoryData Loaded");
         }

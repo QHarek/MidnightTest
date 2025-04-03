@@ -14,6 +14,7 @@ public class ShaftMining : MonoBehaviour, ISaveable
 
     private void Start()
     {
+        SaveManager.Instance.shaftMiningInstance = this;
         _shaftContent = GetComponent<ShaftContent>();
         StartCoroutine(StartMining());
     }
@@ -44,8 +45,7 @@ public class ShaftMining : MonoBehaviour, ISaveable
         ShaftMiningData m_data = data as ShaftMiningData;
         if (m_data != null)
         {
-            _minersCount = m_data.MinersCount;
-            for (int i = 1; i < _minersCount; i++)
+            for (int i = 1; i < m_data.MinersCount; i++)
             {
                 HireWorker();
             }

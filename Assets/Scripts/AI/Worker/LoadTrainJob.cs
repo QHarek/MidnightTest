@@ -19,9 +19,11 @@ public sealed class LoadTrainJob : WorkerJob, ISaveable
     private int _currentCapacity;
     private int _maxCapacity = 50;
     private bool _isLootEmpty = false;
+    private Vector3 _destination;
 
     private void Start()
     {
+        SaveManager.Instance.loadTrainJobs.Add(this);
         _inventoryManager = FindObjectOfType<InventoryManager>();
         _train = FindObjectOfType<Train>();
         AddObserver(GetComponent<JobManager>());
@@ -45,9 +47,10 @@ public sealed class LoadTrainJob : WorkerJob, ISaveable
     {
         NotifyObservers(WorkerStates.GoingToStorage);
         _animator.Play("WorkerWalking");
-        Vector3 destination = GetClosestStorageUnit();
-        _navMeshAgent.SetDestination(destination);
-        yield return new WaitUntil(() => Vector3.Distance(transform.position, destination) < 0.8f);
+        _destination = GetClosestStorageUnit();
+        _navMeshAgent.SetDestination(_destination);
+        _navMeshAgent.isStopped = false;
+        yield return new WaitUntil(() => Vector3.Distance(transform.position, _destination) < 0.8f);
         for (int i = _inventoryManager.PublicItems.Count - 1; i >= 0; i--)
         {
             int amount = 0;
@@ -71,7 +74,8 @@ public sealed class LoadTrainJob : WorkerJob, ISaveable
                 }
                 else
                 {
-                    _loot.Add(itemName, amount);
+                    if(amount > 0)
+                        _loot.Add(itemName, amount);
                 }
                 _currentCapacity += amount;
             }
@@ -91,7 +95,7 @@ public sealed class LoadTrainJob : WorkerJob, ISaveable
             _isLootEmpty = true;
         }
 
-        if (_isLootEmpty)
+        if (_isLootEmpty || _loot.Count == 0)
         {
             StopWorking();
         }
@@ -106,6 +110,7 @@ public sealed class LoadTrainJob : WorkerJob, ISaveable
         NotifyObservers(WorkerStates.GoingToTrain);
         _animator.Play("WorkerCarryBoxWalk");
         _navMeshAgent.SetDestination(_loadSpot.position);
+        _navMeshAgent.isStopped = false;
         _box.SetActive(true);
 
         yield return new WaitUntil(() => Vector3.Distance(transform.position, _loadSpot.position) < 0.1f);
@@ -147,7 +152,7 @@ public sealed class LoadTrainJob : WorkerJob, ISaveable
         {
             _isLootEmpty = m_data.m_isLootEmpty;
             _currentCapacity = m_data.m_currentCapacity;
-            _loot.Clear();
+            _loot = new Dictionary<string, int>();
             _loot.AddRange(m_data.m_loot);
             JobManager jobManager = GetComponent<JobManager>();
             if (jobManager.CurrentJob == Jobs.LoadTrain)
@@ -155,7 +160,7 @@ public sealed class LoadTrainJob : WorkerJob, ISaveable
                 if (jobManager.WorkerState == WorkerStates.GoingToStorage)
                 {
                     StartWorking();
-                }
+                }   
                 else
                 {
                     StartCoroutine(CarryBoxToTrain());

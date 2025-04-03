@@ -18,9 +18,11 @@ public sealed class LoadMachineJob : WorkerJob, ISaveable
     private int _currentCapacity;
     private int _maxCapacity = 50;
     private bool _isLootEmpty = false;
+    private Vector3 _destination;
 
     private void Start()
     {
+        SaveManager.Instance.loadMachineJobs.Add(this);
         _inventoryManager = FindObjectOfType<InventoryManager>();
         AddObserver(GetComponent<JobManager>());
         _storage = GameObject.Find("Storage").transform;
@@ -44,9 +46,10 @@ public sealed class LoadMachineJob : WorkerJob, ISaveable
     {
         NotifyObservers(WorkerStates.GoingToStorage);
         _animator.Play("WorkerWalking");
-        Vector3 destination = GetClosestStorageUnit();
-        _navMeshAgent.SetDestination(destination);
-        yield return new WaitUntil(() => Vector3.Distance(transform.position, destination) < 0.8f);
+        _destination = GetClosestStorageUnit();
+        _navMeshAgent.SetDestination(_destination);
+        _navMeshAgent.isStopped = false;
+        yield return new WaitUntil(() => Vector3.Distance(transform.position, _destination) < 0.8f);
         foreach (string resource in _machine.RequieredResources)
         {
             if (_currentCapacity < _maxCapacity)
@@ -103,6 +106,7 @@ public sealed class LoadMachineJob : WorkerJob, ISaveable
         NotifyObservers(WorkerStates.GoingToMachine);
         _animator.Play("WorkerCarryBoxWalk");
         _navMeshAgent.SetDestination(_loadSpot.position);
+        _navMeshAgent.isStopped = false;
         _box.SetActive(true);
 
         yield return new WaitUntil(() => Vector3.Distance(transform.position, _loadSpot.position) < 0.1f);
@@ -140,7 +144,7 @@ public sealed class LoadMachineJob : WorkerJob, ISaveable
         {
             _isLootEmpty = m_data.m_isLootEmpty;
             _currentCapacity = m_data.m_currentCapacity;
-            _loot.Clear();
+            _loot = new Dictionary<string, int>();
             _loot.AddRange(m_data.m_loot);
             JobManager jobManager = GetComponent<JobManager>();
 
@@ -148,12 +152,14 @@ public sealed class LoadMachineJob : WorkerJob, ISaveable
                 || jobManager.CurrentJob == Jobs.LoadPurifier
                 || jobManager.CurrentJob == Jobs.LoadFusionReactor)
             {
-                if (jobManager.WorkerState == WorkerStates.GoingToMachine)
+                if (jobManager.WorkerState != WorkerStates.GoingToMachine)
                 {
                     StartWorking(m_data.m_machineName);
                 }
                 else
                 {
+                    _machine = GameObject.Find(m_data.m_machineName).GetComponent<Machine>();
+                    _loadSpot = GameObject.Find(m_data.m_machineName + "LoadSpot").transform;
                     StartCoroutine(CarryBoxToMachine());
                 }
             }

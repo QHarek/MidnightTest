@@ -15,10 +15,12 @@ public sealed class UnloadMachineJob : WorkerJob, ISaveable
     private InventoryManager _inventoryManager;
     private Machine _machine;
     private Dictionary<string, int> _loot = new Dictionary<string, int>();
+    private Vector3 _destination;
 
 
     private void Start()
     {
+        SaveManager.Instance.unloadMachineJobs.Add(this);
         _inventoryManager = FindObjectOfType<InventoryManager>();
         AddObserver(GetComponent<JobManager>());
         _storage = GameObject.Find("Storage").transform;
@@ -43,6 +45,7 @@ public sealed class UnloadMachineJob : WorkerJob, ISaveable
         NotifyObservers(WorkerStates.GoingToMachine);
         _animator.Play("WorkerWalking");
         _navMeshAgent.SetDestination(_unloadSpot.position);
+        _navMeshAgent.isStopped = false;
 
         yield return new WaitUntil(() => Vector3.Distance(transform.position, _unloadSpot.position) < 0.1f);
         _loot.AddRange(_machine.ExportProcessedLoot());
@@ -53,11 +56,12 @@ public sealed class UnloadMachineJob : WorkerJob, ISaveable
     {
         NotifyObservers(WorkerStates.GoingToStorage);
         _animator.Play("WorkerCarryBoxWalk");
-        Vector3 destination = GetClosestStorageUnit();
-        _navMeshAgent.SetDestination(destination);
+        _destination = GetClosestStorageUnit();
+        _navMeshAgent.SetDestination(_destination);
+        _navMeshAgent.isStopped = false;
         _box.SetActive(true);
 
-        yield return new WaitUntil(() => Vector3.Distance(transform.position, destination) < 0.8f);
+        yield return new WaitUntil(() => Vector3.Distance(transform.position, _destination) < 0.8f);
 
         foreach (var item in _loot)
         {
@@ -93,7 +97,7 @@ public sealed class UnloadMachineJob : WorkerJob, ISaveable
         UnloadMachineJobData m_data = data as UnloadMachineJobData;
         if (m_data != null)
         {
-            _loot.Clear();
+            _loot = new Dictionary<string, int>();
             _loot.AddRange(m_data.m_loot);
             JobManager jobManager = GetComponent<JobManager>();
             if (jobManager.CurrentJob == Jobs.UnloadCrusher

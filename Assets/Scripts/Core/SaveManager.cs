@@ -10,7 +10,6 @@ public class SaveManager : MonoBehaviour
     public MineCart mineCartInstance;
     public Train trainInstance;
     public SettingsManager settingsManagerInstance;
-    public List<ButtonPressedIndicator> buttonPressedIndicatorsInstances;
     public StorageManager storageManagerInstance;
     public ShaftContent shaftContentInstance;
     public ShaftMining shaftMiningInstance;
@@ -45,70 +44,102 @@ public class SaveManager : MonoBehaviour
     {
         GameData gameData = new GameData();
 
-        gameData.mineCartData = FindObjectOfType<MineCart>().Save() as MineCartData;
-        gameData.trainData = FindObjectOfType<Train>().Save() as TrainData;
+        gameData.mineCartData = mineCartInstance.Save() as MineCartData;
+        gameData.trainData = trainInstance.Save() as TrainData;
 
-        SettingsManager settingsManager = FindObjectOfType<SettingsManager>();
-        if (settingsManager)
+        if (settingsManagerInstance)
         {
-            gameData.settingsManagerData = settingsManager.Save() as SettingsManagerData;
+            gameData.settingsManagerData = settingsManagerInstance.Save() as SettingsManagerData;
         }
 
-        buttonPressedIndicatorsInstances.AddRange(FindObjectsOfType<ButtonPressedIndicator>());
-        gameData.buttonPressedIndicatorDataList = new List<ButtonPressedIndicatorData>();
-        foreach (ButtonPressedIndicator indicator in buttonPressedIndicatorsInstances)
-        {
-            gameData.buttonPressedIndicatorDataList.Add(indicator.Save() as ButtonPressedIndicatorData);
-        }
-        //
+        gameData.storageManagerData = storageManagerInstance.Save() as StorageManagerData;
+        gameData.shaftContentData = shaftContentInstance.Save() as ShaftContentData;
+        gameData.shaftMiningData = shaftMiningInstance.Save() as ShaftMiningData;
+        gameData.inventoryManagerData = inventoryManagerInstance.Save() as InventoryManagerData;
+        gameData.workerHireManagerData = workerHireManagerInstance.Save() as WorkerHireManagerData;
+        gameData.buildingManagerData = buildingManagerInstance.Save() as BuildingManagerData;
 
-        gameData.storageManagerData = FindObjectOfType<StorageManager>().Save() as StorageManagerData;
-        gameData.shaftContentData = FindObjectOfType<ShaftContent>().Save() as ShaftContentData;
-        gameData.shaftMiningData = FindObjectOfType<ShaftMining>().Save() as ShaftMiningData;
-        gameData.inventoryManagerData = FindObjectOfType<InventoryManager>().Save() as InventoryManagerData;
-        gameData.workerHireManagerData = FindObjectOfType<WorkerHireManager>().Save() as WorkerHireManagerData;
-        gameData.buildingManagerData = FindObjectOfType<BuildingManager>().Save() as BuildingManagerData;
-
-        machines.AddRange(FindObjectsOfType<Machine>());
         gameData.machineDataList = new List<MachineData>();
+        for (int i = 0; machines.Count > i; i++)
+        {
+            if (machines[i] == null)
+            {
+                machines.RemoveAt(i);
+                i--;
+            }
+        }
         foreach (Machine machine in machines)
         {
             gameData.machineDataList.Add(machine.Save() as MachineData);
         }
 
-        gameData.balanceManagerData = FindObjectOfType<BalanceManager>().Save() as BalanceManagerData;
+        gameData.balanceManagerData = balanceManagerInstance.Save() as BalanceManagerData;
 
-
-        jobManagers.AddRange(FindObjectsOfType<JobManager>());
         gameData.jobManagerDataList = new List<JobManagerData>();
+        for (int i = 0; jobManagers.Count > i; i++)
+        {
+            if (jobManagers[i] == null)
+            {
+                jobManagers.RemoveAt(i);
+                i--;
+            }
+        }
         foreach (JobManager job in jobManagers)
         {
             gameData.jobManagerDataList.Add(job.Save() as JobManagerData);
         }
 
-        unloadCartJobs.AddRange(FindObjectsOfType<UnloadCartJob>());
         gameData.unloadCartJobDataList = new List<UnloadCartJobData>();
+        for (int i = 0; unloadCartJobs.Count > i; i++)
+        {
+            if (unloadCartJobs[i] == null)
+            {
+                unloadCartJobs.RemoveAt(i);
+                i--;
+            }
+        }
         foreach (UnloadCartJob job in unloadCartJobs)
         {
             gameData.unloadCartJobDataList.Add(job.Save() as UnloadCartJobData);
         }
 
-        loadTrainJobs.AddRange(FindObjectsOfType<LoadTrainJob>());
         gameData.loadTrainJobDataList = new List<LoadTrainJobData>();
+        for (int i = 0; loadTrainJobs.Count > i; i++)
+        {
+            if (loadTrainJobs[i] == null)
+            {
+                loadTrainJobs.RemoveAt(i);
+                i--;
+            }
+        }
         foreach (LoadTrainJob job in loadTrainJobs)
         {
             gameData.loadTrainJobDataList.Add(job.Save() as LoadTrainJobData);
         }
 
-        unloadMachineJobs.AddRange(FindObjectsOfType<UnloadMachineJob>());
         gameData.unloadMachineJobDataList = new List<UnloadMachineJobData>();
+        for (int i = 0; unloadMachineJobs.Count > i; i++)
+        {
+            if (unloadMachineJobs[i] == null)
+            {
+                unloadMachineJobs.RemoveAt(i);
+                i--;
+            }
+        }
         foreach (UnloadMachineJob job in unloadMachineJobs)
         {
             gameData.unloadMachineJobDataList.Add(job.Save() as UnloadMachineJobData);
         }
 
-        loadMachineJobs.AddRange(FindObjectsOfType<LoadMachineJob>());
         gameData.loadMachineJobDataList = new List<LoadMachineJobData>();
+        for (int i = 0; loadMachineJobs.Count > i; i++)
+        {
+            if (loadMachineJobs[i] == null)
+            {
+                loadMachineJobs.RemoveAt(i);
+                i--;
+            }
+        }
         foreach (LoadMachineJob job in loadMachineJobs)
         {
             gameData.loadMachineJobDataList.Add(job.Save() as LoadMachineJobData);

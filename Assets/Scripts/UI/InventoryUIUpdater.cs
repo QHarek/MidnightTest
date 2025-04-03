@@ -10,4 +10,14 @@ public class InventoryUIUpdater : MonoBehaviour
     {
         _inventorySlots.Where(m => m.name.Contains(itemId)).First().UpdateSlot(amount);
     }
+
+    public void OnGameLoad(Dictionary<string, int> keepAmounts, List<string> recycleList)
+    {
+        foreach (var slot in _inventorySlots)
+        {
+            var itemKeep = keepAmounts.Where(m => slot.name.Contains(m.Key)).FirstOrDefault();
+            var itemRecycle = recycleList.Where(m => slot.name.Contains(m)).FirstOrDefault();
+            slot.OnGameLoad(itemKeep, itemRecycle);
+        }
+    }
 }

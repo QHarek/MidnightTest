@@ -6,6 +6,11 @@ public class SettingsManager : MonoBehaviour, ISaveable
     [SerializeField] private AudioSource _musicSource;
     [SerializeField] private Slider _volumeSlider;
 
+    private void Start()
+    {
+        SaveManager.Instance.settingsManagerInstance = this;
+    }
+
     public void SwitchMusic()
     {
         _musicSource.enabled = !_musicSource.enabled;
@@ -21,8 +26,8 @@ public class SettingsManager : MonoBehaviour, ISaveable
         SettingsManagerData m_data = data as SettingsManagerData;
         if (m_data != null)
         {
-            _musicSource.enabled = m_data.IsMusicEnabled;
-            _musicSource.volume = m_data.Volume;
+            _musicSource.enabled = m_data.m_isMusicEnabled;
+            _musicSource.volume = m_data.m_volume;
             Debug.Log("Settings Loaded");
         }
         else
@@ -35,8 +40,8 @@ public class SettingsManager : MonoBehaviour, ISaveable
     {
         return new SettingsManagerData()
         {
-            Volume = _volumeSlider.value,
-            IsMusicEnabled = _musicSource.enabled,
+            m_volume = _volumeSlider.value,
+            m_isMusicEnabled = _musicSource.enabled,
         };
     }
 }
@@ -44,6 +49,6 @@ public class SettingsManager : MonoBehaviour, ISaveable
 [System.Serializable]
 public class SettingsManagerData
 {
-    public float Volume;
-    public bool IsMusicEnabled;
+    public float m_volume;
+    public bool m_isMusicEnabled;
 }
