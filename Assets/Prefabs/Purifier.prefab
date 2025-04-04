@@ -1200,7 +1200,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 100004, guid: 4f1e87ee37fd9904b8aa23d71ab1b9a1, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 100008, guid: 4f1e87ee37fd9904b8aa23d71ab1b9a1, type: 3}
       propertyPath: m_Name
@@ -1331,6 +1331,10 @@ PrefabInstance:
       value: -2
       objectReference: {fileID: 0}
     - target: {fileID: 19800006, guid: 4f1e87ee37fd9904b8aa23d71ab1b9a1, type: 3}
+      propertyPath: InitialModule.startSize.scalar
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 19800006, guid: 4f1e87ee37fd9904b8aa23d71ab1b9a1, type: 3}
       propertyPath: InitialModule.startRotationX.minMaxState
       value: 3
       objectReference: {fileID: 0}
@@ -1341,7 +1345,7 @@ PrefabInstance:
     - target: {fileID: 19900006, guid: 4f1e87ee37fd9904b8aa23d71ab1b9a1, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
-      objectReference: {fileID: 2100000, guid: 6d7056011f1a430418a308ed22098905, type: 2}
+      objectReference: {fileID: 2100000, guid: da154f58167fcb24da4b73db87dc7bb4, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
