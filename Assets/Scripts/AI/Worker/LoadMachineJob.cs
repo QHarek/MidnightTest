@@ -28,7 +28,7 @@ public sealed class LoadMachineJob : WorkerJob, ISaveable
         _storage = GameObject.Find("Storage").transform;
     }
 
-    internal override void StartWorking(string? machineName = null)
+    internal override void StartWorking(string machineName = null)
     {
         base.StartWorking();
         _machine = GameObject.Find(machineName).GetComponent<Machine>();

@@ -2,6 +2,7 @@ using UnityEngine;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using Unity.VisualScripting;
+using static UnityEditor.Progress;
 
 public class InventoryManager : MonoBehaviour, ISaveable
 {
@@ -13,7 +14,7 @@ public class InventoryManager : MonoBehaviour, ISaveable
     private List<string> _itemsToRecycle = new List<string>();
     private int _currentCapacity = 0;
     private bool _isFull = false;
-    private bool _readyForRecycle = false;
+    private bool _isreadyForRecycle = false;
 
     private Dictionary<string, int> _items = new Dictionary<string, int>()
     {
@@ -42,7 +43,7 @@ public class InventoryManager : MonoBehaviour, ISaveable
     public ReadOnlyDictionary<string, int> PublicItems;
     public int CurrentCapacity => _currentCapacity;
     public bool IsFull => _isFull;
-    public bool ReadyForRecycle => _readyForRecycle;
+    public bool IsReadyForRecycle => _isreadyForRecycle;
 
     private void Start()
     {
@@ -73,7 +74,7 @@ public class InventoryManager : MonoBehaviour, ISaveable
         }
         if (GetAvailableItemAmount(itemId) > 0 && _itemsToRecycle.Contains(itemId))
         {
-            _readyForRecycle = true;
+            _isreadyForRecycle = true;
         }
     }
 
@@ -95,11 +96,11 @@ public class InventoryManager : MonoBehaviour, ISaveable
         {
             if (_items[itemId] > 0)
             {
-                _readyForRecycle = true;
+                _isreadyForRecycle = true;
                 return;
             }
         }
-        _readyForRecycle = false;
+        _isreadyForRecycle = false;
     }
 
     public bool CheckAvailableResources(List<string> resources)
@@ -107,6 +108,18 @@ public class InventoryManager : MonoBehaviour, ISaveable
         foreach (var itemId in resources)
         {
             if (_itemsToRecycle.Contains(itemId) && GetAvailableItemAmount(itemId) > 0)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public bool IsAnyItemAvailable()
+    {
+        foreach(var itemId in _items)
+        {
+            if (GetAvailableItemAmount(itemId.Key) > 0)
             {
                 return true;
             }
@@ -169,7 +182,7 @@ public class InventoryManager : MonoBehaviour, ISaveable
             _itemsToRecycle.Remove(itemId);
             if (_itemsToRecycle.Count == 0)
             {
-                _readyForRecycle = false;
+                _isreadyForRecycle = false;
             }
         }
         else
@@ -177,7 +190,7 @@ public class InventoryManager : MonoBehaviour, ISaveable
             _itemsToRecycle.Add(itemId);
             if (GetAvailableItemAmount(itemId) > 0)
             {
-                _readyForRecycle = true;
+                _isreadyForRecycle = true;
             }
         }
     }
@@ -216,7 +229,7 @@ public class InventoryManager : MonoBehaviour, ISaveable
         {
             _currentCapacity = m_data.m_currentCapacity;
             _isFull = m_data.m_isFull;
-            _readyForRecycle = m_data.m_readyForRecycle;
+            _isreadyForRecycle = m_data.m_readyForRecycle;
             _itemsToRecycle = new List<string>();
             _itemsToRecycle.AddRange(m_data.m_itemsToRecycle);
             _items = new Dictionary<string, int>();
@@ -224,6 +237,11 @@ public class InventoryManager : MonoBehaviour, ISaveable
             _keepAmounts = new Dictionary<string, int>();
             _keepAmounts.AddRange(m_data.m_keepAmounts);
             _inventoryUIUpdater.OnGameLoad(_keepAmounts, _itemsToRecycle);
+            _capacityUIUpdater.UpdateCurrentCapacity(_currentCapacity);
+            foreach (var item in _items)
+            {
+                _inventoryUIUpdater.UpdateInventoryUI(item.Key, item.Value);
+            }
             EnableDisableBoxes(_currentCapacity);
             Debug.Log("InventoryData Loaded");
         }
@@ -239,7 +257,7 @@ public class InventoryManager : MonoBehaviour, ISaveable
         {
             m_currentCapacity = _currentCapacity,
             m_isFull = _isFull,
-            m_readyForRecycle = _readyForRecycle,
+            m_readyForRecycle = _isreadyForRecycle,
             m_itemsToRecycle = new List<string>(),
             m_items = new Dictionary<string, int>(),
             m_keepAmounts = new Dictionary<string, int>(),

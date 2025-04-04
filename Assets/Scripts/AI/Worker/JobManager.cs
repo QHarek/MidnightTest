@@ -120,8 +120,8 @@ public class JobManager : MonoBehaviour, IWorkerStateObserver, IBuildingManagerO
             }
         }
 
-        if(_inventoryManager.CurrentCapacity > 0 && _currentJob == Jobs.Idle 
-            && _train.IsAvailableToLoad)
+        if(_inventoryManager.CurrentCapacity > 0 && _inventoryManager.IsAnyItemAvailable()
+            && _currentJob == Jobs.Idle && _train.IsAvailableToLoad)
         {
             _currentJob = Jobs.LoadTrain;
             WorkerJob.JobsAndWorkers[_currentJob]++;

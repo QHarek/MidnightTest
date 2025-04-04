@@ -28,7 +28,7 @@ public sealed class UnloadCartJob : WorkerJob, ISaveable
         _unloadSpot = GameObject.Find("UnloadSpot").transform;
     }
 
-    internal override void StartWorking(string? machine = null)
+    internal override void StartWorking(string machine = null)
     {
         base.StartWorking();
         StartCoroutine(GoToCart());

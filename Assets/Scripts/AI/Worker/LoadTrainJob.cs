@@ -31,7 +31,7 @@ public sealed class LoadTrainJob : WorkerJob, ISaveable
         _loadSpot = GameObject.Find("LoadSpot").transform;
     }
 
-    internal override void StartWorking(string? machine = null)
+    internal override void StartWorking(string machine = null)
     {
         base.StartWorking();
         StartCoroutine(GoToStorage());
