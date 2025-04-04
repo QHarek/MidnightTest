@@ -2,7 +2,6 @@ using UnityEngine;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using Unity.VisualScripting;
-using static UnityEditor.Progress;
 
 public class InventoryManager : MonoBehaviour, ISaveable
 {
